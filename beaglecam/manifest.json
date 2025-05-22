@@ -2,7 +2,7 @@
   "domain": "beaglecam",
   "name": "BeagleCam Printer Camera",
   "version": "1.0.0",
-  "documentation": "https://github.com/YOUR_USERNAME/beaglecam",
+  "documentation": "https://github.com/jgrant216/ha-beaglecam",
   "dependencies": [],
   "codeowners": ["@YOUR_GITHUB_USERNAME"],
   "config_flow": true,
