@@ -1,0 +1,7 @@
+{
+  "name": "BeagleCam Integration",
+  "content_in_root": false,
+  "domain": "beaglecam",
+  "zip_release": false,
+  "filename": "custom_components/beaglecam/manifest.json"
+}

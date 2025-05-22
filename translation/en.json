@@ -1,0 +1,21 @@
+{
+  "config": {
+    "step": {
+      "user": {
+        "title": "BeagleCam Setup",
+        "description": "Enter printer connection details.",
+        "data": {
+          "ip_address": "IP Address",
+          "username": "Username",
+          "password": "Password"
+        }
+      }
+    },
+    "error": {
+      "cannot_connect": "Could not connect to BeagleCam. Check details."
+    },
+    "abort": {
+      "already_configured": "This device is already configured."
+    }
+  }
+}
