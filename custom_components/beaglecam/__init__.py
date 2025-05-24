@@ -1,3 +1,4 @@
+import asyncio
 from datetime import timedelta
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -20,20 +21,29 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
     async def async_update_data():
         try:
+            try:
+                connection = await api.get_connection_state()
+            except Exception as err:
+                _LOGGER.debug("BeagleCam is offline. Polling again in 300s.")
+                await asyncio.sleep(300)  # throttle manually
+                return None
+
+            # Printer is online – proceed with normal status polling
             print_status = await api.get_print_status()
             temp_status = await api.get_temperature_status()
 
-            # Merge responses, excluding duplicate 'cmd' keys etc.
+            # Merge API responses
             combined = {
                 **{k: v for k, v in print_status.items() if k != "cmd"},
                 **{k: v for k, v in temp_status.items() if k != "cmd"},
+                **{k: v for k, v in connection.items() if k not in ("cmd", "result")}
             }
 
             _LOGGER.debug("Combined BeagleCam data: %s", combined)
             return combined
 
         except Exception as err:
-            _LOGGER.error("Error fetching BeagleCam data: %s", err)
+            _LOGGER.warning("BeagleCam polling error: %s", err)
             raise UpdateFailed(f"Data fetch failed: {err}")
 
     coordinator = DataUpdateCoordinator(
