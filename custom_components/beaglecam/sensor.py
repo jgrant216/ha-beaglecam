@@ -15,9 +15,11 @@ class BeagleCamStatusSensor(CoordinatorEntity, SensorEntity):
     @property
     def state(self):
         # Choose a representative value (e.g., progress or status)
+        if not hasattr(self, "coordinator") or not getattr(self.coordinator, "data", None):
+            return "unknown"
         return self.coordinator.data.get("progress", "unknown")
 
     @property
     def extra_state_attributes(self):
         # Return the full response as attributes
-        return self.coordinator.data
+        return getattr(self.coordinator, "data", {})
