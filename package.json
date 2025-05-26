@@ -1,0 +1,6 @@
+{
+  "name": "ha-beaglecam",
+  "version": "0.1.0",
+  "description": "Home Assistant BeagleCam integration",
+  "private": true
+}
