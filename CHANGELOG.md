@@ -1,3 +1,10 @@
+# [0.4.0](https://github.com/jgrant216/ha-beaglecam/compare/v0.3.0...v0.4.0) (2025-05-27)
+
+
+### Features
+
+* update manifest with release version ([70b7794](https://github.com/jgrant216/ha-beaglecam/commit/70b7794cf539e0cd7f0b710522221a2e7c99a654))
+
 # [0.3.0](https://github.com/jgrant216/ha-beaglecam/compare/v0.2.0...v0.3.0) (2025-05-26)
 
 
