@@ -1,3 +1,10 @@
+# [0.5.0](https://github.com/jgrant216/ha-beaglecam/compare/v0.4.1...v0.5.0) (2025-06-03)
+
+
+### Features
+
+* create script/update-manifest.js ([c2c8c1a](https://github.com/jgrant216/ha-beaglecam/commit/c2c8c1a74bb4fd189b8c0e548ef1c15bc9bc912d))
+
 ## [0.4.1](https://github.com/jgrant216/ha-beaglecam/compare/v0.4.0...v0.4.1) (2025-06-03)
 
 
