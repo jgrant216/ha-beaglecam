@@ -1,6 +1,6 @@
 {
   "name": "ha-beaglecam",
-  "version": "0.5.1",
+  "version": "1.0.0",
   "private": true,
   "dependencies": {
     "@semantic-release/changelog": "^6.0.3",
