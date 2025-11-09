@@ -16,6 +16,7 @@ class BeagleCamAPI:
             "connection_state": 0,
             "print_status": 0,
             "temperature_status": 0,
+            "info_get": 0,
         }
 
     async def get_connection_state(self):
