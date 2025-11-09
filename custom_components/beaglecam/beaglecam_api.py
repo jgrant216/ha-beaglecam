@@ -111,3 +111,43 @@ class BeagleCamAPI:
             if self._call_counts["temperature_status"] % 10 == 0:
                 _LOGGER.debug("BeagleCamAPI.get_temperature_status response: %s", responseJson)
             return responseJson
+
+    async def get_info(self):
+        """
+
+        API Example Return:
+        {
+            "cmd":101,
+            "result":0,
+            "p2pid":"....-######-.....",
+            "hardware":"Beagle V2",
+            "firmware":"1.2.9",
+            "mirror_mode":3,
+            "video_mode":0,
+            "online_num":0,
+            "network_type":"Wifi",
+            "macaddress":"2C:C3:E6:..:..:..",
+            "IPaddress":"192.168.###.###",
+            "netmask":"255.255.255.0",
+            "gateway":"192.168.###.1",
+            "dns1":"192.168.###.###",
+            "dns2":"192.168.###.###",
+            "dhcp":1,
+            "day_night_mode":0,
+            "alarm_voice":"default"
+            }
+        """
+        payload = {
+            "cmd": 101,
+            "pro": "info_get",
+            "user": self._username,
+            "pwd": self._password
+        }
+
+        async with self._session.post(self._url, json=payload) as response:
+            response.raise_for_status()
+            responseJson = await response.json()
+            self._call_counts["info_get"] += 1
+            if self._call_counts["info_get"] % 10 == 0:
+                _LOGGER.debug("BeagleCamAPI.info_get response: %s", responseJson)
+            return responseJson

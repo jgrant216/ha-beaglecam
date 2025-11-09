@@ -29,11 +29,13 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                 return None
 
             # Printer is online – proceed with normal status polling
+            cam_info = await api.get_info()
             print_status = await api.get_print_status()
             temp_status = await api.get_temperature_status()
 
             # Merge API responses
             combined = {
+                **{k: v for k, v in cam_info.items() if k not in ("cmd", "result")},
                 **{k: v for k, v in print_status.items() if k != "cmd"},
                 **{k: v for k, v in temp_status.items() if k != "cmd"},
                 **{k: v for k, v in connection.items() if k not in ("cmd", "result")}
