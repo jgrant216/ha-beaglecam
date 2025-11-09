@@ -1,5 +1,7 @@
 import asyncio
 from datetime import timedelta
+
+from aiohttp.web_exceptions import HTTPError
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
@@ -44,6 +46,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             _LOGGER.debug("Combined BeagleCam data: %s", combined)
             return combined
 
+        except HTTPError as httperr:
+            _LOGGER.warning("BeagleCam HTTP error: %s status: %s reason: %s", httperr, httperr.status, httperr.reason)
+            raise UpdateFailed(f"Data fetch failed: {httperr}")
         except Exception as err:
             _LOGGER.warning("BeagleCam polling error: %s", err)
             raise UpdateFailed(f"Data fetch failed: {err}")
