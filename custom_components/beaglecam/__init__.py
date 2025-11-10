@@ -48,10 +48,10 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
         except HTTPError as httperr:
             _LOGGER.warning("BeagleCam HTTP error: %s status: %s reason: %s", httperr, httperr.status, httperr.reason)
-            raise UpdateFailed(f"Data fetch failed: {httperr}")
+            raise UpdateFailed(f"Data fetch failed: {httperr}") from httperr
         except Exception as err:
             _LOGGER.warning("BeagleCam polling error: %s", err)
-            raise UpdateFailed(f"Data fetch failed: {err}")
+            raise UpdateFailed(f"Data fetch failed: {err}") from err
 
     coordinator = DataUpdateCoordinator(
         hass,
