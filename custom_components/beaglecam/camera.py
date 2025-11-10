@@ -14,13 +14,10 @@ class BeagleCamCamera(CoordinatorEntity, Camera):
         self._attr_name = "BeagleCam Camera"
         self._attr_unique_id = "beaglecam_camera"
         self._attr_brand = "Mintion"
+        self._attr_supported_features = CameraEntityFeature.STREAM
 
     @cached_property
-    def supported_features(self) -> CameraEntityFeature:
-        return CameraEntityFeature.STREAM
-
-    @cached_property
-    def stream_source(self) -> str | None:
+    async def stream_source(self) -> str | None:
         return self.coordinator.data.get("IPaddress", "unknown") % "rtsp://%s:554/0"
 
     @cached_property
