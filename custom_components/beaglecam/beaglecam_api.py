@@ -57,7 +57,7 @@ class BeagleCamAPI:
             "user": self._username,
             "pwd": self._password
         }
-        return self._do_post(payload, "connection_state")
+        return await self._do_post(payload, "connection_state")
 
     async def get_print_status(self):
         """Poll printer status using cmd 318.
@@ -81,7 +81,7 @@ class BeagleCamAPI:
             "user": self._username,
             "pwd": self._password
         }
-        return self._do_post(payload, "print_status")
+        return await self._do_post(payload, "print_status")
 
     async def get_temperature_status(self):
         """
@@ -102,7 +102,7 @@ class BeagleCamAPI:
             "user": self._username,
             "pwd": self._password
         }
-        return self._do_post(payload, "temperature_status")
+        return await self._do_post(payload, "temperature_status")
 
     async def get_info(self):
         """
@@ -134,7 +134,7 @@ class BeagleCamAPI:
             "user": self._username,
             "pwd": self._password
         }
-        return self._do_post(payload, payload["pro"])
+        return await self._do_post(payload, payload["pro"])
 
     async def get_baudrate(self):
         """
@@ -152,7 +152,7 @@ class BeagleCamAPI:
             "user": self._username,
             "pwd": self._password
         }
-        return self._do_post(payload, payload["pro"])
+        return await self._do_post(payload, payload["pro"])
 
     async def get_tlv_params(self):
         """
@@ -189,7 +189,7 @@ class BeagleCamAPI:
             "user": self._username,
             "pwd": self._password
         }
-        return self._do_post(payload, payload["pro"])
+        return await self._do_post(payload, payload["pro"])
 
     async def get_model(self):
         """
@@ -1109,7 +1109,7 @@ class BeagleCamAPI:
             "user": self._username,
             "pwd": self._password
         }
-        return self._do_post(payload, payload["pro"])
+        return await self._do_post(payload, payload["pro"])
 
     async def get_osd(self):
         """
@@ -1126,7 +1126,7 @@ class BeagleCamAPI:
             "user": self._username,
             "pwd": self._password
         }
-        return self._do_post(payload, payload["pro"])
+        return await self._do_post(payload, payload["pro"])
 
     async def get_video_mode(self):
         """
@@ -1143,7 +1143,7 @@ class BeagleCamAPI:
             "user": self._username,
             "pwd": self._password
         }
-        return self._do_post(payload, payload["pro"])
+        return await self._do_post(payload, payload["pro"])
 
     async def update_check(self):
         """
@@ -1167,7 +1167,7 @@ class BeagleCamAPI:
             "user": self._username,
             "pwd": self._password
         }
-        return self._do_post(payload, payload["pro"])
+        return await self._do_post(payload, payload["pro"])
 
     async def get_timelapse_videos(self):
         """
@@ -1196,7 +1196,7 @@ class BeagleCamAPI:
             "user": self._username,
             "pwd": self._password
         }
-        return self._do_post(payload, payload["pro"])
+        return await self._do_post(payload, payload["pro"])
 
     async def connect_printer(self):
         """
@@ -1214,7 +1214,7 @@ class BeagleCamAPI:
             "user": self._username,
             "pwd": self._password
         }
-        return self._do_post(payload, payload["pro"])
+        return await self._do_post(payload, payload["pro"])
 
     async def disconnect_printer(self):
         """
@@ -1232,7 +1232,7 @@ class BeagleCamAPI:
             "user": self._username,
             "pwd": self._password
         }
-        return self._do_post(payload, payload["pro"])
+        return await self._do_post(payload, payload["pro"])
 
     async def get_print_files(self):
         """
@@ -1261,7 +1261,7 @@ class BeagleCamAPI:
             "user": self._username,
             "pwd": self._password
         }
-        return self._do_post(payload, payload["pro"])
+        return await self._do_post(payload, payload["pro"])
 
     async def get_temperature_log(self):
         """
@@ -1298,7 +1298,7 @@ class BeagleCamAPI:
             "user": self._username,
             "pwd": self._password
         }
-        return self._do_post(payload, payload["pro"])
+        return await self._do_post(payload, payload["pro"])
 
     async def get_recording_params(self):
         """
@@ -1322,7 +1322,7 @@ class BeagleCamAPI:
             "user": self._username,
             "pwd": self._password
         }
-        return self._do_post(payload, payload["pro"])
+        return await self._do_post(payload, payload["pro"])
 
     async def get_printer_settings(self):
         """
@@ -1341,7 +1341,7 @@ class BeagleCamAPI:
             "user": self._username,
             "pwd": self._password
         }
-        return self._do_post(payload, payload["pro"])
+        return await self._do_post(payload, payload["pro"])
 
     async def start_print(self, filename: str):
         """
@@ -1360,7 +1360,7 @@ class BeagleCamAPI:
             "user": self._username,
             "pwd": self._password
         }
-        return self._do_post(payload, payload["pro"])
+        return await self._do_post(payload, payload["pro"])
 
     async def pause_print(self):
         """
@@ -1378,7 +1378,7 @@ class BeagleCamAPI:
             "user": self._username,
             "pwd": self._password
         }
-        return self._do_post(payload, payload["pro"])
+        return await self._do_post(payload, payload["pro"])
 
     async def stop_print(self):
         """
@@ -1396,7 +1396,7 @@ class BeagleCamAPI:
             "user": self._username,
             "pwd": self._password
         }
-        return self._do_post(payload, payload["pro"])
+        return await self._do_post(payload, payload["pro"])
 
     async def get_model_info(self, filename: str):
         """
@@ -1421,4 +1421,4 @@ class BeagleCamAPI:
             "user": self._username,
             "pwd": self._password
         }
-        return self._do_post(payload, payload["pro"])
+        return await self._do_post(payload, payload["pro"])
