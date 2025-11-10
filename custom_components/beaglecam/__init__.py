@@ -21,6 +21,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         async_get_clientsession(hass),
     )
 
+    cam_info = await api.get_info()
+
     async def async_update_data():
         try:
             try:
@@ -31,13 +33,11 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
                 return None
 
             # Printer is online – proceed with normal status polling
-            cam_info = await api.get_info()
             print_status = await api.get_print_status()
             temp_status = await api.get_temperature_status()
 
             # Merge API responses
             combined = {
-                **{k: v for k, v in cam_info.items() if k not in ("cmd", "result")},
                 **{k: v for k, v in print_status.items() if k != "cmd"},
                 **{k: v for k, v in temp_status.items() if k != "cmd"},
                 **{k: v for k, v in connection.items() if k not in ("cmd", "result")}
@@ -63,7 +63,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
     await coordinator.async_config_entry_first_refresh()
 
-    hass.data.setdefault(DOMAIN, {})
+    hass.data.setdefault(DOMAIN, **{k: v for k, v in cam_info.items() if k not in ("cmd", "result")})
     hass.data[DOMAIN][entry.entry_id] = coordinator
 
     await hass.config_entries.async_forward_entry_setups(entry, ["sensor", "camera"])
