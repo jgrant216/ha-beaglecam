@@ -48,7 +48,7 @@ class BeagleCamAPI:
 
             - result: 0 indicates success.
             - connect_state: 1 if connected.
-            - print_state: 102 indicates idle
+            - print_state: 102 indicates idle, 101 indicates printing, 103 indicates paused.
             - Other keys represent hardware status indicators.
         """
         payload = {
@@ -60,9 +60,9 @@ class BeagleCamAPI:
         return await self._do_post(payload, "connection_state")
 
     async def get_print_status(self):
-        """Poll printer status using cmd 318.
+        """Poll print job status using cmd 318.
         
-        API Example Return:
+        API Example Return (Idle):
         {
             "cmd": 318,
             "result": 0,
@@ -73,6 +73,19 @@ class BeagleCamAPI:
             "layerIndex": 0,
             "printingHeight": 0,
             "hadSize": 0
+        }
+
+        API Example Return (Printing):
+        {
+            "cmd":318,
+            "result":0,
+            "file_name":"Revised Kobo Clara Switch 2_0.05mm_PLA_MK3S_9m.gcode",
+            "progress":10,
+            "time_left":484,
+            "time_cost":52,
+            "layerIndex":3,
+            "printingHeight":0.300000,
+            "hadSize":40414
         }
         """
         payload = {

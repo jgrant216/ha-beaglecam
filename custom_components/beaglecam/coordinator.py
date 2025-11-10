@@ -12,6 +12,7 @@ from const import CONF_IP, DOMAIN, DEFAULT_SCAN_INTERVAL
 from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
+from homeassistant.util import dt
 from .beaglecam_api import BeagleCamAPI
 
 _LOGGER = logging.getLogger(__name__)
@@ -55,15 +56,16 @@ class BeagleCamDataUpdateCoordinator(DataUpdateCoordinator):
             temp_status = await self._beaglecam.get_temperature_status()
 
             # Merge API responses
-            combined = {
-                **{k: v for k, v in print_status.items() if k != "cmd"},
+            printer_state = {
                 **{k: v for k, v in temp_status.items() if k != "cmd"},
                 **{k: v for k, v in connection.items() if k not in ("cmd", "result")},
             }
+            job_state = {
+                ** {k: v for k, v in print_status.items() if k != "cmd"}
+            }
 
-            _LOGGER.debug("Combined BeagleCam data: %s", combined)
-            return combined
-            # return {"job": job, "printer": printer, "last_read_time": dt_util.utcnow()}
+            _LOGGER.debug("Combined BeagleCam data: %s", printer_state)
+            return {"job": job_state, "printer": printer_state, "last_read_time": dt.utcnow()}
 
         except HTTPError as httperr:
             _LOGGER.warning("BeagleCam HTTP error: %s status: %s reason: %s", httperr, httperr.status, httperr.reason)
@@ -87,7 +89,7 @@ class BeagleCamDataUpdateCoordinator(DataUpdateCoordinator):
     @property
     def device_info(self) -> DeviceInfo:
         """Device info."""
-        unique_id = cast(str, self.config_entry.unique_id)
+        unique_id = self.data["camera"].get("p2pid", cast(str, self.config_entry.unique_id))
         configuration_url = URL.build(scheme="http", host=self.config_entry.data[CONF_IP])
 
         return DeviceInfo(
