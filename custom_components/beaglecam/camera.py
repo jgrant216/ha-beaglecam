@@ -32,7 +32,7 @@ class BeagleCamCamera(CoordinatorEntity[BeagleCamDataUpdateCoordinator], Camera)
         self._attr_name = "BeagleCam Camera"
         self._attr_unique_id = config_entry.unique_id
         self._attr_brand = "Mintion"
-        self._attr_model = coordinator.device_info.model
+        self._attr_model = coordinator.device_info.get("model", "BeagleCam")
         self._username = config_entry.data.get(CONF_USERNAME)
         self._password = config_entry.data.get(CONF_PASSWORD)
         self._ip_address = Template(config_entry.data.get(CONF_HOST), hass)
