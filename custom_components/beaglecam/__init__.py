@@ -1,10 +1,10 @@
 from typing import cast
 
-from helpers import device_registry
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import EVENT_HOMEASSISTANT_STOP, CONF_DEVICE_ID, Platform
 from homeassistant.core import HomeAssistant, callback, Event, ServiceCall
 from homeassistant.exceptions import ServiceValidationError
+from homeassistant.helpers import device_registry
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 
 from .beaglecam_api import BeagleCamAPI

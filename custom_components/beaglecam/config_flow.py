@@ -1,4 +1,3 @@
-from .beaglecam_api import BeagleCamAPI
 from homeassistant import config_entries
 from homeassistant.const import CONF_HOST, CONF_USERNAME, CONF_PASSWORD
 import voluptuous as vol
@@ -6,6 +5,7 @@ import aiohttp
 import async_timeout
 import logging
 
+from .beaglecam_api import BeagleCamAPI
 from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
