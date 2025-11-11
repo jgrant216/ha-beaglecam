@@ -23,7 +23,7 @@ class BeagleCamCamera(Camera):
         self._attr_model = "BeagleCam v2"
         self._username = device_info.get(CONF_USERNAME)
         self._password = device_info.get(CONF_PASSWORD)
-        self._ip_address = Template(device_info.get(CONF_HOST), hass)
+        self._ip_address = Template(device_info.get(CONF_HOST), None)
         self._attr_supported_features = CameraEntityFeature.STREAM
         self.stream_options["rtsp_transport"] = "TCP"
 

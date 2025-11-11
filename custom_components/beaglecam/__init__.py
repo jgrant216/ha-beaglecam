@@ -1,7 +1,7 @@
 from typing import cast
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import EVENT_HOMEASSISTANT_STOP, CONF_DEVICE_ID, Platform
+from homeassistant.const import EVENT_HOMEASSISTANT_STOP, CONF_DEVICE_ID, Platform, CONF_HOST, CONF_USERNAME, CONF_PASSWORD
 from homeassistant.core import HomeAssistant, callback, Event, ServiceCall
 from homeassistant.exceptions import ServiceValidationError
 from homeassistant.helpers import device_registry
@@ -23,9 +23,9 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     session = async_get_clientsession(hass)
 
     api = BeagleCamAPI(
-        entry.data["ip_address"],
-        entry.data["username"],
-        entry.data["password"],
+        entry.data[CONF_HOST],
+        entry.data[CONF_USERNAME],
+        entry.data[CONF_PASSWORD],
         session
     )
 
@@ -48,7 +48,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         "api": api,
     }
 
-    await hass.config_entries.async_forward_entry_setups(entry, ["sensor", "camera"])
+    await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
     async def async_printer_connect(call: ServiceCall) -> None:
         """Connect to a printer."""
