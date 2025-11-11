@@ -29,6 +29,7 @@ class BeagleCamCamera(CoordinatorEntity[BeagleCamDataUpdateCoordinator], Camera)
     def __init__(self, hass: HomeAssistant, coordinator: BeagleCamDataUpdateCoordinator,
                  config_entry: ConfigEntry) -> None:
         super().__init__(coordinator)
+        Camera.__init__(self)
         self._attr_name = "BeagleCam Camera"
         self._attr_unique_id = config_entry.unique_id
         self._attr_brand = "Mintion"
