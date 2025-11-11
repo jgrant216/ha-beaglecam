@@ -2,8 +2,8 @@
 from typing import cast
 
 from homeassistant.config_entries import ConfigEntry
-from homeassistant.const import EVENT_HOMEASSISTANT_STOP, CONF_DEVICE_ID, Platform, CONF_HOST, CONF_USERNAME, CONF_PASSWORD
-from homeassistant.core import HomeAssistant, callback, Event, ServiceCall
+from homeassistant.const import CONF_DEVICE_ID, Platform, CONF_HOST, CONF_USERNAME, CONF_PASSWORD
+from homeassistant.core import HomeAssistant, ServiceCall
 from homeassistant.exceptions import ServiceValidationError
 from homeassistant.helpers import device_registry
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
@@ -30,16 +30,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         session
     )
 
-    @callback
-    def _async_close_websession(event: Event | None = None) -> None:
-        """Close websession."""
-        session.detach()
-
-    entry.async_on_unload(_async_close_websession)
-    entry.async_on_unload(
-        hass.bus.async_listen(EVENT_HOMEASSISTANT_STOP, _async_close_websession)
-    )
-
     bc_coordinator = BeagleCamDataUpdateCoordinator(hass, api, entry, DEFAULT_SCAN_INTERVAL)
 
     await bc_coordinator.async_config_entry_first_refresh()
@@ -47,7 +37,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     hass.data[DOMAIN][entry.entry_id] = {
         "coordinator": bc_coordinator,
     }
-    #TODO? entry.unique_id = hass.data[DOMAIN][entry.entry_id]["camera"]["p2pid"]
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
