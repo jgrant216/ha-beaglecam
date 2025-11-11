@@ -14,7 +14,7 @@ from .coordinator import BeagleCamDataUpdateCoordinator
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry,
                             async_add_entities: AddConfigEntryEntitiesCallback):
-    coordinator = hass.data[DOMAIN][entry.entry_id]["coordinator"]
+    coordinator: BeagleCamDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]["coordinator"]
     device_id = entry.unique_id
 
     entities: list[SensorEntity] = \
@@ -52,7 +52,6 @@ class BeagleCamSensorBase(CoordinatorEntity[BeagleCamDataUpdateCoordinator], Sen
         self._device_id = device_id
         self._attr_name = f"BeagleCam {sensor_type}"
         self._attr_unique_id = f"{sensor_type}-{device_id}"
-        self._attr_device_info = coordinator.DeviceInfo
 
 
 class BeagleCamStatusSensor(BeagleCamSensorBase):

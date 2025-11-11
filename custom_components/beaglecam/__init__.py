@@ -1,3 +1,4 @@
+
 from typing import cast
 
 from homeassistant.config_entries import ConfigEntry
