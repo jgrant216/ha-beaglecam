@@ -20,7 +20,7 @@ _LOGGER = logging.getLogger(__name__)
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     hass.data.setdefault(DOMAIN, {})
-    session = async_get_clientsession(hass),
+    session = async_get_clientsession(hass)
 
     api = BeagleCamAPI(
         entry.data["ip_address"],

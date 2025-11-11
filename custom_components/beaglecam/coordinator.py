@@ -43,7 +43,7 @@ class BeagleCamDataUpdateCoordinator(DataUpdateCoordinator):
         self._printer_offline = False
         self.data = {"camera": None, "printer": None, "job": None, "last_read_time": None}
 
-    async def async_update_data(self):
+    async def _async_update_data(self):
         try:
             try:
                 connection = await self._beaglecam.get_connection_state()
