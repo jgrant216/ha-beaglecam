@@ -8,11 +8,13 @@ _LOGGER = logging.getLogger(__name__)
 PRINT_STATE_PRINTING = 101
 PRINT_STATE_IDLE = 102
 PRINT_STATE_PAUSED = 103
+PRINT_STATE_COMPLETED = 105
 
 PRINT_STATE = {
     PRINT_STATE_PRINTING: "printing",
     PRINT_STATE_IDLE: "idle",
     PRINT_STATE_PAUSED: "paused",
+    PRINT_STATE_COMPLETED: "completed",
 }
 
 class BeagleCamAPI:
@@ -89,7 +91,7 @@ class BeagleCamAPI:
 
             - result: 0 indicates success.
             - connect_state: 1 if connected.
-            - print_state: 102 indicates idle, 101 indicates printing, 103 indicates paused.
+            - print_state: 102 indicates idle, 101 indicates printing, 103 indicates paused, 105 indicates completed.
             - Other keys represent hardware status indicators.
         """
         payload = {
