@@ -52,7 +52,7 @@ class BeagleCamSensorBase(CoordinatorEntity[BeagleCamDataUpdateCoordinator], Sen
         self._device_id = device_id
         self._attr_name = f"BeagleCam {sensor_type}"
         self._attr_unique_id = f"{sensor_type}-{device_id}"
-        self._attr_device_info = coordinator.device_info
+        self._attr_device_info = coordinator.DeviceInfo
 
 
 class BeagleCamStatusSensor(BeagleCamSensorBase):

@@ -36,7 +36,7 @@ class BeagleCamPrintingBinarySensor(CoordinatorEntity[BeagleCamDataUpdateCoordin
         self._device_id = device_id
         self._attr_name = "BeagleCam Printing"
         self._attr_unique_id = f"printing-{device_id}"
-        self._attr_device_info = coordinator.device_info
+        self._attr_device_info = coordinator.DeviceInfo
 
     @property
     def is_on(self):
