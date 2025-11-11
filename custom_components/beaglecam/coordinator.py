@@ -57,14 +57,15 @@ class BeagleCamDataUpdateCoordinator(DataUpdateCoordinator):
 
             # Merge API responses
             printer_state = {
-                **{k: v for k, v in temp_status.items() if k != "cmd"},
+                **{k: v for k, v in temp_status.items() if k not in ("cmd", "result")},
                 **{k: v for k, v in connection.items() if k not in ("cmd", "result")},
             }
             job_state = {
-                ** {k: v for k, v in print_status.items() if k != "cmd"}
+                ** {k: v for k, v in print_status.items() if k not in ("cmd", "result")},
             }
 
             _LOGGER.debug("Combined BeagleCam data: %s", printer_state)
+            _LOGGER.debug("Combined BeagleCam Job data: %s", job_state)
             return {"job": job_state, "printer": printer_state, "last_read_time": dt.utcnow()}
 
         except HTTPError as httperr:
