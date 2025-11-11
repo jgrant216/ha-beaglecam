@@ -48,6 +48,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
         "coordinator": bc_coordinator,
         "api": api,
     }
+    entry.unique_id = hass.data[DOMAIN][entry.entry_id].data["camera"]["p2pid"]
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 

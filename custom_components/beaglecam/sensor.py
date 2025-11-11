@@ -1,15 +1,20 @@
+import logging
 from datetime import datetime, timedelta
 
 from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
-from homeassistant.config_entries import ConfigEntry
-from homeassistant.core import HomeAssistant
-from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.components.sensor import SensorEntity
+from homeassistant.config_entries import ConfigEntry
 from homeassistant.const import PERCENTAGE, UnitOfTemperature
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers.device_registry import DeviceInfo
+from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
+
 from .beaglecam_api import PRINT_STATE, PRINT_STATE_PRINTING
 from .const import DOMAIN
 from .coordinator import BeagleCamDataUpdateCoordinator
+
+_LOGGER = logging.getLogger(__name__)
 
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry,
@@ -52,6 +57,11 @@ class BeagleCamSensorBase(CoordinatorEntity[BeagleCamDataUpdateCoordinator], Sen
         self._device_id = device_id
         self._attr_name = f"BeagleCam {sensor_type}"
         self._attr_unique_id = f"{sensor_type}-{device_id}"
+
+    @property
+    def device_info(self) -> DeviceInfo:
+        """Return device info."""
+        return self.coordinator.device_info
 
 
 class BeagleCamStatusSensor(BeagleCamSensorBase):
@@ -176,6 +186,7 @@ class BeagleCamTemperatureSensor(BeagleCamSensorBase):
 
         # Determine the key to look for based on temp_type and tool
         key = "des_" if self._temp_type == "target" else "" + "tempture_" + self._api_tool[0:3]
+        _LOGGER.debug("Fetching temperature for key: %s", key)
         return round(printer.get(key, None), 2) if printer.get(key, None) is not None else None
 
     @property

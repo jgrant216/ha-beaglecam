@@ -1,8 +1,11 @@
 from homeassistant.components.binary_sensor import BinarySensorEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
+from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
+
+from .beaglecam_api import PRINT_STATE_PRINTING
 from .const import DOMAIN
 from .coordinator import BeagleCamDataUpdateCoordinator
 
@@ -44,9 +47,14 @@ class BeagleCamPrintingBinarySensor(CoordinatorEntity[BeagleCamDataUpdateCoordin
         if not (printer := self.coordinator.data["printer"]):
             return None
 
-        return self.available and bool(printer["print_state"] == 101)
+        return self.available and bool(printer["print_state"] == PRINT_STATE_PRINTING)
 
     @property
     def available(self) -> bool:
         """Return if entity is available."""
         return self.coordinator.last_update_success and self.coordinator.data["printer"]["connect_state"] == 1
+
+    @property
+    def device_info(self) -> DeviceInfo:
+        """Return device info."""
+        return self.coordinator.device_info
