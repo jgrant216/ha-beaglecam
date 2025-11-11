@@ -1,12 +1,12 @@
+from custom_components.beaglecam import BeagleCamAPI
 from homeassistant import config_entries
-from homeassistant.const import CONF_HOST
-from homeassistant.core import callback
+from homeassistant.const import CONF_HOST, CONF_USERNAME, CONF_PASSWORD
 import voluptuous as vol
 import aiohttp
 import async_timeout
 import logging
 
-from .const import DOMAIN, CONF_USERNAME, CONF_PASSWORD
+from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -20,27 +20,16 @@ async def validate_input(data):
     ip = data[CONF_HOST]
     username = data[CONF_USERNAME]
     password = data[CONF_PASSWORD]
-    url = f"http://{ip}/set3DPiCmd"
-
-    payload = {
-        "cmd": 100,
-        "pro": "check_user",
-        "user": username,
-        "pwd": password
-    }
 
     try:
         async with aiohttp.ClientSession() as session:
             async with async_timeout.timeout(5):
-                async with session.post(url, json=payload) as response:
-                    if response.status != 200:
-                        raise Exception("Invalid response")
-                    resp_json = await response.json()
-                    # You may want to verify a key in the JSON, like 'result': 'ok'
-                    if "result" not in resp_json:
-                        raise Exception("Unexpected response format")
-                    if resp_json["result"] != 0:
-                        raise Exception("Authentication failed")
+                api = BeagleCamAPI(ip, username, password, session)
+                response = await api.check_user()
+                if "result" not in response:
+                    raise Exception("Unexpected response format")
+                if response.get("result", None) != 0:
+                    raise Exception("Authentication failed")
     except Exception as e:
         _LOGGER.exception("Failed to connect to BeagleCam")
         raise

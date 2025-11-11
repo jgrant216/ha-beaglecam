@@ -4,11 +4,10 @@ from typing import Mapping, Any
 
 import yarl
 from homeassistant.components.camera import Camera, CameraEntityFeature
-from homeassistant.const import CONF_HOST
+from homeassistant.const import CONF_HOST, CONF_USERNAME, CONF_PASSWORD
 from homeassistant.core import HomeAssistant
 from homeassistant.exceptions import TemplateError
 from homeassistant.helpers.template import Template
-from .const import CONF_USERNAME, CONF_PASSWORD
 
 _LOGGER = logging.getLogger(__name__)
 
