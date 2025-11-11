@@ -17,7 +17,6 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry,
     coordinator = hass.data[DOMAIN][entry.entry_id]["coordinator"]
     device_id = entry.unique_id
 
-    assert device_id is not None
     entities: list[SensorEntity] = \
         [BeagleCamTemperatureSensor(coordinator, tool, sensor_type, device_id) for tool in ("nozzle", "bed") for
          sensor_type in ("actual", "target")] + \

@@ -18,8 +18,6 @@ async def async_setup_entry(
     ]["coordinator"]
     device_id = config_entry.unique_id
 
-    assert device_id is not None
-
     entities: list[BinarySensorEntity] = [
         BeagleCamPrintingBinarySensor(coordinator, device_id),
     ]
