@@ -1,4 +1,4 @@
-from custom_components.beaglecam import BeagleCamAPI
+from .beaglecam_api import BeagleCamAPI
 from homeassistant import config_entries
 from homeassistant.const import CONF_HOST, CONF_USERNAME, CONF_PASSWORD
 import voluptuous as vol
@@ -15,6 +15,7 @@ DATA_SCHEMA = vol.Schema({
     vol.Required(CONF_USERNAME): str,
     vol.Required(CONF_PASSWORD): str,
 })
+
 
 async def validate_input(data):
     ip = data[CONF_HOST]

@@ -1,8 +1,8 @@
-from components.binary_sensor import BinarySensorEntity
-from config_entries import ConfigEntry
-from core import HomeAssistant
-from helpers.entity_platform import AddConfigEntryEntitiesCallback
-from helpers.update_coordinator import CoordinatorEntity
+from homeassistant.components.binary_sensor import BinarySensorEntity
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
+from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import DOMAIN
 from .coordinator import BeagleCamDataUpdateCoordinator
 

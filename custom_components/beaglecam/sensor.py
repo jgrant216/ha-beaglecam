@@ -1,24 +1,26 @@
 from datetime import datetime, timedelta
 
-from beaglecam_api import PRINT_STATE, PRINT_STATE_PRINTING
-from components.sensor import SensorDeviceClass, SensorStateClass
-from config_entries import ConfigEntry
-from core import HomeAssistant
-from helpers.entity_platform import AddConfigEntryEntitiesCallback
+from homeassistant.components.sensor import SensorDeviceClass, SensorStateClass
+from homeassistant.config_entries import ConfigEntry
+from homeassistant.core import HomeAssistant
+from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.components.sensor import SensorEntity
 from homeassistant.const import PERCENTAGE, UnitOfTemperature
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
+from .beaglecam_api import PRINT_STATE, PRINT_STATE_PRINTING
 from .const import DOMAIN
 from .coordinator import BeagleCamDataUpdateCoordinator
 
 
-async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddConfigEntryEntitiesCallback):
+async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry,
+                            async_add_entities: AddConfigEntryEntitiesCallback):
     coordinator = hass.data[DOMAIN][entry.entry_id]["coordinator"]
     device_id = entry.unique_id
 
     assert device_id is not None
     entities: list[SensorEntity] = \
-        [BeagleCamTemperatureSensor(coordinator, tool, sensor_type, device_id) for tool in ("nozzle", "bed") for sensor_type in ("actual", "target")] + \
+        [BeagleCamTemperatureSensor(coordinator, tool, sensor_type, device_id) for tool in ("nozzle", "bed") for
+         sensor_type in ("actual", "target")] + \
         [
             BeagleCamStatusSensor(coordinator, device_id),
             BeagleCamJobPercentageSensor(coordinator, device_id),
@@ -208,4 +210,3 @@ class BeagleCamFileNameSensor(BeagleCamSensorBase):
             return False
         job = self.coordinator.data.get("job", None)
         return job and "file_name" in job
-
