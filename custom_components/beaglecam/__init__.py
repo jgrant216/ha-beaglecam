@@ -14,7 +14,7 @@ from .coordinator import BeagleCamDataUpdateCoordinator
 
 import logging
 
-PLATFORMS = [Platform.SENSOR, Platform.CAMERA]
+PLATFORMS = [Platform.SENSOR, Platform.CAMERA, Platform.BINARY_SENSOR]
 
 _LOGGER = logging.getLogger(__name__)
 
