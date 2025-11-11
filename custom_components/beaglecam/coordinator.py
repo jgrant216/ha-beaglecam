@@ -43,6 +43,11 @@ class BeagleCamDataUpdateCoordinator(DataUpdateCoordinator):
         self.data = {"camera": None, "printer": None, "job": None, "last_read_time": None}
 
     async def _async_update_data(self):
+        if self._beaglecam.closed:
+            _LOGGER.debug("BeagleCam session is closed. Stopping updates. BeagleCam: %s, session: %s, config: %s", self._beaglecam, self._beaglecam._session, self.config_entry)
+            _LOGGER.debug(self.data)
+            raise UpdateFailed("BeagleCam session is closed")
+
         try:
             try:
                 connection = await self._beaglecam.get_connection_state()
@@ -69,10 +74,10 @@ class BeagleCamDataUpdateCoordinator(DataUpdateCoordinator):
             return {"job": job_state, "printer": printer_state, "last_read_time": dt.utcnow()}
 
         except HTTPError as httperr:
-            _LOGGER.warning("BeagleCam HTTP error: %s status: %s reason: %s", httperr, httperr.status, httperr.reason)
+            _LOGGER.exception("BeagleCam HTTP error: %s status: %s reason: %s", httperr, httperr.status, httperr.reason)
             raise UpdateFailed(f"Data fetch failed: {httperr}") from httperr
         except Exception as err:
-            _LOGGER.warning("BeagleCam polling error: %s", err)
+            _LOGGER.exception("BeagleCam polling error: %s", err)
             raise UpdateFailed(f"Data fetch failed: {err}") from err
 
     async def _async_setup(self) -> None:

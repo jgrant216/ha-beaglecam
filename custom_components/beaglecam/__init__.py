@@ -46,9 +46,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
 
     hass.data[DOMAIN][entry.entry_id] = {
         "coordinator": bc_coordinator,
-        "api": api,
     }
-    #entry.unique_id = hass.data[DOMAIN][entry.entry_id]["camera"]["p2pid"]
+    #TODO? entry.unique_id = hass.data[DOMAIN][entry.entry_id]["camera"]["p2pid"]
 
     await hass.config_entries.async_forward_entry_setups(entry, PLATFORMS)
 
@@ -63,6 +62,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
             SERVICE_PR_CONNECT,
             async_printer_connect
         )
+
+    _LOGGER.debug("BeagleCam integration setup complete for entry %s: %s", entry.entry_id, entry)
 
     return True
 

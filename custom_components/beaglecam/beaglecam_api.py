@@ -29,6 +29,10 @@ class BeagleCamAPI:
             "temperature_status": 0,
         })
 
+    @property
+    def closed(self) -> bool:
+        return self._session.closed
+
     async def _do_post(self, payload: dict, debug_key: str):
         async with self._session.post(self._url, json=payload) as response:
             response.raise_for_status()
