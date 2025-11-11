@@ -177,6 +177,7 @@ class BeagleCamTemperatureSensor(BeagleCamSensorBase):
         super().__init__(coordinator, f"{temp_type} {tool} temp", device_id)
         self._temp_type = temp_type
         self._api_tool = tool
+        self.key = ("des_" if self._temp_type == "target" else "") + "tempture_" + self._api_tool[0:3]
 
     @property
     def native_value(self):
@@ -185,9 +186,8 @@ class BeagleCamTemperatureSensor(BeagleCamSensorBase):
             return None
 
         # Determine the key to look for based on temp_type and tool
-        key = "des_" if self._temp_type == "target" else "" + "tempture_" + self._api_tool[0:3]
-        _LOGGER.debug("Fetching temperature for key: %s", key)
-        return round(printer.get(key, None), 2) if printer.get(key, None) is not None else None
+        _LOGGER.debug("Fetching temperature for key: %s", self.key)
+        return round(printer.get(self.key, None), 2) if printer.get(self.key, None) is not None else None
 
     @property
     def available(self) -> bool:
