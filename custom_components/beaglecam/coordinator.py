@@ -4,7 +4,6 @@ from datetime import timedelta
 
 from aiohttp.web_exceptions import HTTPError
 
-from typing import cast
 from yarl import URL
 
 from homeassistant.config_entries import ConfigEntry
@@ -90,12 +89,12 @@ class BeagleCamDataUpdateCoordinator(DataUpdateCoordinator):
     @property
     def device_info(self) -> DeviceInfo:
         """Device info."""
-        unique_id = self.data["camera"].get("p2pid", cast(str, self.config_entry.unique_id))
         configuration_url = URL.build(scheme="http", host=self.config_entry.data[CONF_HOST])
 
         return DeviceInfo(
-            identifiers={(DOMAIN, unique_id)},
+            identifiers={(DOMAIN, self.config_entry.unique_id)},
             manufacturer="Mintion",
-            name=self.data["camera"].get('hardware', 'BeagleCam'),
+            name=self.data.get("camera", {}).get('hardware', 'BeagleCam'),
             configuration_url=str(configuration_url),
+            model=self.data.get("camera", {}).get('hardware', 'BeagleCam'),
         )
