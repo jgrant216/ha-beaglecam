@@ -45,7 +45,7 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
     await bc_coordinator.async_config_entry_first_refresh()
 
     hass.data[DOMAIN][entry.entry_id] = {
-        "coordinator": coordinator,
+        "coordinator": bc_coordinator,
         "api": api,
     }
 
