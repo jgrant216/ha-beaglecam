@@ -1,25 +1,211 @@
+from datetime import datetime, timedelta
+
+from beaglecam_api import PRINT_STATE, PRINT_STATE_PRINTING
+from components.sensor import SensorDeviceClass, SensorStateClass
+from config_entries import ConfigEntry
+from core import HomeAssistant
+from helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.components.sensor import SensorEntity
+from homeassistant.const import PERCENTAGE, UnitOfTemperature
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import DOMAIN
+from .coordinator import BeagleCamDataUpdateCoordinator
 
-async def async_setup_entry(hass, entry, async_add_entities):
-    coordinator = hass.data[DOMAIN][entry.entry_id]
-    async_add_entities([BeagleCamStatusSensor(coordinator)])
 
-class BeagleCamStatusSensor(CoordinatorEntity, SensorEntity):
-    def __init__(self, coordinator):
+async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry, async_add_entities: AddConfigEntryEntitiesCallback):
+    coordinator = hass.data[DOMAIN][entry.entry_id]["coordinator"]
+    device_id = entry.unique_id
+
+    assert device_id is not None
+    entities: list[SensorEntity] = \
+        [BeagleCamTemperatureSensor(coordinator, tool, sensor_type, device_id) for tool in ("nozzle", "bed") for sensor_type in ("actual", "target")] + \
+        [
+            BeagleCamStatusSensor(coordinator, device_id),
+            BeagleCamJobPercentageSensor(coordinator, device_id),
+            BeagleCamFileNameSensor(coordinator, device_id),
+            BeagleCamStartTimeSensor(coordinator, device_id),
+            BeagleCamEstimatedFinishTimeSensor(coordinator, device_id),
+        ]
+    async_add_entities(entities)
+
+
+def _is_printer_printing(printer: dict) -> bool:
+    return (
+            printer
+            and printer["print_state"]
+            and printer["print_state"] == PRINT_STATE_PRINTING
+    )
+
+
+class BeagleCamSensorBase(CoordinatorEntity[BeagleCamDataUpdateCoordinator], SensorEntity):
+    """Representation of a BeagleCam sensor."""
+
+    def __init__(
+            self,
+            coordinator: BeagleCamDataUpdateCoordinator,
+            sensor_type: str,
+            device_id: str,
+    ) -> None:
+        """Initialize a new BeagleCam sensor."""
         super().__init__(coordinator)
-        self._attr_name = "BeagleCam Print Status"
-        self._attr_unique_id = "beaglecam_print_status"
+        self._device_id = device_id
+        self._attr_name = f"BeagleCam {sensor_type}"
+        self._attr_unique_id = f"{sensor_type}-{device_id}"
+        self._attr_device_info = coordinator.device_info
+
+
+class BeagleCamStatusSensor(BeagleCamSensorBase):
+    _attr_icon = "mdi:printer-3d"
+
+    def __init__(
+            self, coordinator: BeagleCamDataUpdateCoordinator, device_id: str
+    ) -> None:
+        """Initialize a new BeagleCam sensor."""
+        super().__init__(coordinator, "Current State", device_id)
 
     @property
-    def state(self):
-        # Choose a representative value (e.g., progress or status)
-        if not hasattr(self, "coordinator") or not getattr(self.coordinator, "data", None):
-            return "unknown"
-        return self.coordinator.data.get("progress", "unknown")
+    def native_value(self):
+        """Return sensor state."""
+        printer = self.coordinator.data.get("printer", None)
+        if not printer or not printer.get("print_state", None):
+            return None
+
+        return PRINT_STATE[printer["print_state"]]
 
     @property
-    def extra_state_attributes(self):
-        # Return the full response as attributes
-        return getattr(self.coordinator, "data", {})
+    def available(self) -> bool:
+        """Return if entity is available."""
+        return self.coordinator.last_update_success and self.coordinator.data["printer"]
+
+
+class BeagleCamJobPercentageSensor(BeagleCamSensorBase):
+    _attr_native_unit_of_measurement = PERCENTAGE
+    _attr_icon = "mdi:file-percent"
+
+    def __init__(
+            self, coordinator: BeagleCamDataUpdateCoordinator, device_id: str
+    ) -> None:
+        """Initialize a new BeagleCam sensor."""
+        super().__init__(coordinator, "Job Percentage", device_id)
+
+    @property
+    def native_value(self):
+        """Return sensor state."""
+        job = self.coordinator.data.get("job", None)
+        if not job:
+            return None
+
+        if not (state := job.get("progress", None)):
+            return 0
+
+        return round(state, 2)
+
+
+class BeagleCamEstimatedFinishTimeSensor(BeagleCamSensorBase):
+    _attr_device_class = SensorDeviceClass.TIMESTAMP
+
+    def __init__(
+            self, coordinator: BeagleCamDataUpdateCoordinator, device_id: str
+    ) -> None:
+        """Initialize a new BeagleCam sensor."""
+        super().__init__(coordinator, "Job Estimated Finish Time", device_id)
+
+    @property
+    def native_value(self) -> datetime | None:
+        """Return sensor state."""
+        job = self.coordinator.data.get("job", None)
+        if not job \
+                or not (time_left := job.get("time_left", None)) \
+                or not _is_printer_printing(self.coordinator.data["printer"]):
+            return None
+
+        read_time = self.coordinator.data["last_read_time"]
+
+        return (read_time + timedelta(seconds=time_left)).replace(
+            second=0
+        )
+
+
+class BeagleCamStartTimeSensor(BeagleCamSensorBase):
+    _attr_device_class = SensorDeviceClass.TIMESTAMP
+
+    def __init__(
+            self, coordinator: BeagleCamDataUpdateCoordinator, device_id: str
+    ) -> None:
+        """Initialize a new BeagleCam sensor."""
+        super().__init__(coordinator, "Job Start Time", device_id)
+
+    @property
+    def native_value(self) -> datetime | None:
+        """Return sensor state."""
+        job = self.coordinator.data.get("job", None)
+        if not job \
+                or not (time_cost := job.get("time_cost", None)) \
+                or not _is_printer_printing(self.coordinator.data["printer"]):
+            return None
+
+        read_time = self.coordinator.data["last_read_time"]
+
+        return (read_time - timedelta(seconds=time_cost)).replace(
+            second=0
+        )
+
+
+class BeagleCamTemperatureSensor(BeagleCamSensorBase):
+    _attr_native_unit_of_measurement = UnitOfTemperature.CELSIUS
+    _attr_device_class = SensorDeviceClass.TEMPERATURE
+    _attr_state_class = SensorStateClass.MEASUREMENT
+
+    def __init__(
+            self,
+            coordinator: BeagleCamDataUpdateCoordinator,
+            tool: str,  # e.g., "nozzle", "bed"
+            temp_type: str,  # "actual" or "target"
+            device_id: str,
+    ) -> None:
+        """Initialize a new BeagleCam sensor."""
+        super().__init__(coordinator, f"{temp_type} {tool} temp", device_id)
+        self._temp_type = temp_type
+        self._api_tool = tool
+
+    @property
+    def native_value(self):
+        printer = self.coordinator.data.get("printer", None)
+        if not printer:
+            return None
+
+        # Determine the key to look for based on temp_type and tool
+        key = "des_" if self._temp_type == "target" else "" + "tempture_" + self._api_tool[0:3]
+        return round(printer.get(key, None), 2) if printer.get(key, None) is not None else None
+
+    @property
+    def available(self) -> bool:
+        """Return if entity is available."""
+        return self.coordinator.last_update_success and self.coordinator.data["printer"]
+
+
+class BeagleCamFileNameSensor(BeagleCamSensorBase):
+
+    def __init__(
+            self,
+            coordinator: BeagleCamDataUpdateCoordinator,
+            device_id: str,
+    ) -> None:
+        """Initialize a new BeagleCam sensor."""
+        super().__init__(coordinator, "Current File", device_id)
+
+    @property
+    def native_value(self) -> str | None:
+        """Return sensor state."""
+        job = self.coordinator.data.get("job", None)
+
+        return job.get("file_name", None)
+
+    @property
+    def available(self) -> bool:
+        """Return if entity is available."""
+        if not self.coordinator.last_update_success:
+            return False
+        job = self.coordinator.data.get("job", None)
+        return job and "file_name" in job
+

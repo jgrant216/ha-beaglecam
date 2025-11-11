@@ -5,6 +5,15 @@ import logging
 
 _LOGGER = logging.getLogger(__name__)
 
+PRINT_STATE_PRINTING = 101
+PRINT_STATE_IDLE = 102
+PRINT_STATE_PAUSED = 103
+
+PRINT_STATE = {
+    PRINT_STATE_PRINTING: "printing",
+    PRINT_STATE_IDLE: "idle",
+    PRINT_STATE_PAUSED: "paused",
+}
 
 class BeagleCamAPI:
     def __init__(self, ip: str, username: str, password: str, session: aiohttp.ClientSession):
@@ -28,6 +37,34 @@ class BeagleCamAPI:
             if self._call_counts[debug_key] % 10 == 0:
                 _LOGGER.debug("BeagleCamAPI.%s response: %s", debug_key, response_json)
             return response_json
+
+    async def check_user(self):
+        """
+        Example API Return:
+        {
+            "cmd":100,
+            "result":0,
+            "admin":1,
+            "modle":0,  # possibly a typo for "model"
+            "type":0
+        }
+
+        Example Invalid Login Return:
+        {
+            "cmd":100,
+            "result":-3,
+            "admin":1,
+            "modle":0,
+            "type":0
+        }
+        """
+        payload = {
+            "cmd": 100,
+            "pro": "check_user",
+            "user": self._username,
+            "pwd": self._password
+        }
+        return await self._do_post(payload, "check_user")
 
     async def get_connection_state(self):
         """

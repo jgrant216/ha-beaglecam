@@ -1,10 +1,11 @@
 from components.binary_sensor import BinarySensorEntity
 from config_entries import ConfigEntry
 from core import HomeAssistant
-from custom_components.beaglecam import BeagleCamDataUpdateCoordinator
 from helpers.entity_platform import AddConfigEntryEntitiesCallback
 from helpers.update_coordinator import CoordinatorEntity
 from .const import DOMAIN
+from .coordinator import BeagleCamDataUpdateCoordinator
+
 
 async def async_setup_entry(
         hass: HomeAssistant,
@@ -24,6 +25,7 @@ async def async_setup_entry(
     ]
 
     async_add_entities(entities)
+
 
 class BeagleCamPrintingBinarySensor(CoordinatorEntity[BeagleCamDataUpdateCoordinator], BinarySensorEntity):
     def __init__(

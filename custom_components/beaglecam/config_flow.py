@@ -1,29 +1,30 @@
 from homeassistant import config_entries
+from homeassistant.const import CONF_HOST
 from homeassistant.core import callback
 import voluptuous as vol
 import aiohttp
 import async_timeout
 import logging
 
-from .const import DOMAIN, CONF_IP, CONF_USERNAME, CONF_PASSWORD
+from .const import DOMAIN, CONF_USERNAME, CONF_PASSWORD
 
 _LOGGER = logging.getLogger(__name__)
 
 DATA_SCHEMA = vol.Schema({
-    vol.Required(CONF_IP): str,
+    vol.Required(CONF_HOST): str,
     vol.Required(CONF_USERNAME): str,
     vol.Required(CONF_PASSWORD): str,
 })
 
 async def validate_input(data):
-    ip = data[CONF_IP]
+    ip = data[CONF_HOST]
     username = data[CONF_USERNAME]
     password = data[CONF_PASSWORD]
     url = f"http://{ip}/set3DPiCmd"
 
     payload = {
-        "cmd": 312,
-        "pro": "get_prconnectstate",
+        "cmd": 100,
+        "pro": "check_user",
         "user": username,
         "pwd": password
     }
@@ -38,6 +39,8 @@ async def validate_input(data):
                     # You may want to verify a key in the JSON, like 'result': 'ok'
                     if "result" not in resp_json:
                         raise Exception("Unexpected response format")
+                    if resp_json["result"] != 0:
+                        raise Exception("Authentication failed")
     except Exception as e:
         _LOGGER.exception("Failed to connect to BeagleCam")
         raise

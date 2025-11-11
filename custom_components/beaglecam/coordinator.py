@@ -8,12 +8,13 @@ from typing import cast
 from yarl import URL
 
 from homeassistant.config_entries import ConfigEntry
-from const import CONF_IP, DOMAIN, DEFAULT_SCAN_INTERVAL
 from homeassistant.core import HomeAssistant
+from homeassistant.const import CONF_HOST
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.update_coordinator import DataUpdateCoordinator, UpdateFailed
 from homeassistant.util import dt
 from .beaglecam_api import BeagleCamAPI
+from .const import DOMAIN, DEFAULT_SCAN_INTERVAL
 
 _LOGGER = logging.getLogger(__name__)
 
@@ -90,7 +91,7 @@ class BeagleCamDataUpdateCoordinator(DataUpdateCoordinator):
     def device_info(self) -> DeviceInfo:
         """Device info."""
         unique_id = self.data["camera"].get("p2pid", cast(str, self.config_entry.unique_id))
-        configuration_url = URL.build(scheme="http", host=self.config_entry.data[CONF_IP])
+        configuration_url = URL.build(scheme="http", host=self.config_entry.data[CONF_HOST])
 
         return DeviceInfo(
             identifiers={(DOMAIN, unique_id)},
