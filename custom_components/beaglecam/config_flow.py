@@ -10,6 +10,8 @@ from .const import DOMAIN
 
 _LOGGER = logging.getLogger(__name__)
 
+"""Config flow for BeagleCam integration."""
+
 DATA_SCHEMA = vol.Schema({
     vol.Required(CONF_HOST): str,
     vol.Required(CONF_USERNAME): str,

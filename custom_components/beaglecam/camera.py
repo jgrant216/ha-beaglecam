@@ -16,9 +16,11 @@ from .coordinator import BeagleCamDataUpdateCoordinator
 
 _LOGGER = logging.getLogger(__name__)
 
+"""Camera entity representing the BeagleCam camera and its RTSP stream."""
 
 async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry,
                             async_add_entities: AddConfigEntryEntitiesCallback):
+    """Set up the BeagleCam camera based on a config entry."""
     coordinator: BeagleCamDataUpdateCoordinator = hass.data[DOMAIN][
         config_entry.entry_id
     ]["coordinator"]
@@ -26,6 +28,7 @@ async def async_setup_entry(hass: HomeAssistant, config_entry: ConfigEntry,
 
 
 class BeagleCamCamera(CoordinatorEntity[BeagleCamDataUpdateCoordinator], Camera):
+    """Representation of a BeagleCam camera."""
     def __init__(self, hass: HomeAssistant, coordinator: BeagleCamDataUpdateCoordinator,
                  config_entry: ConfigEntry) -> None:
         super().__init__(coordinator)
@@ -63,6 +66,7 @@ class BeagleCamCamera(CoordinatorEntity[BeagleCamDataUpdateCoordinator], Camera)
 
     @property
     def use_stream_for_stills(self) -> bool:
+        """Return True, because BeagleCam does not support still images."""
         return True
 
     async def async_camera_image(

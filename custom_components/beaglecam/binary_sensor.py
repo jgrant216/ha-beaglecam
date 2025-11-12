@@ -4,18 +4,19 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
+from sensor import _is_printer_printing
 
-from .beaglecam_api import PRINT_STATE_PRINTING
 from .const import DOMAIN
 from .coordinator import BeagleCamDataUpdateCoordinator
 
+"""Binary sensor platform for BeagleCam integration."""
 
 async def async_setup_entry(
         hass: HomeAssistant,
         config_entry: ConfigEntry,
         async_add_entities: AddConfigEntryEntitiesCallback,
 ) -> None:
-    """Set up the available OctoPrint binary sensors."""
+    """Set up the available BeagleCam binary sensors."""
     coordinator: BeagleCamDataUpdateCoordinator = hass.data[DOMAIN][
         config_entry.entry_id
     ]["coordinator"]
@@ -29,6 +30,10 @@ async def async_setup_entry(
 
 
 class BeagleCamPrintingBinarySensor(CoordinatorEntity[BeagleCamDataUpdateCoordinator], BinarySensorEntity):
+    """Printing state binary sensor for BeagleCam.
+
+    On when a print job is in progress.
+    """
     def __init__(
             self,
             coordinator: BeagleCamDataUpdateCoordinator,
@@ -46,12 +51,15 @@ class BeagleCamPrintingBinarySensor(CoordinatorEntity[BeagleCamDataUpdateCoordin
         if not (printer := self.coordinator.data["printer"]):
             return None
 
-        return self.available and bool(printer["print_state"] == PRINT_STATE_PRINTING)
+        return (self.available and
+                _is_printer_printing(printer))
 
     @property
     def available(self) -> bool:
         """Return if entity is available."""
-        return self.coordinator.last_update_success and self.coordinator.data["printer"]["connect_state"] == 1
+        return (self.coordinator.last_update_success and
+                self.coordinator.data["printer"] and
+                self.coordinator.data["printer"]["connect_state"] == 1)
 
     @property
     def device_info(self) -> DeviceInfo:

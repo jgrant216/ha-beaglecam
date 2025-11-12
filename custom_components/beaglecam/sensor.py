@@ -16,9 +16,13 @@ from .coordinator import BeagleCamDataUpdateCoordinator
 
 _LOGGER = logging.getLogger(__name__)
 
+"""
+Set up BeagleCam sensors based on a config entry.
+"""
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry,
                             async_add_entities: AddConfigEntryEntitiesCallback):
+    """Perform initial setup of the BeagleCam sensors based on a config entry."""
     coordinator: BeagleCamDataUpdateCoordinator = hass.data[DOMAIN][entry.entry_id]["coordinator"]
     device_id = entry.unique_id
 
@@ -65,6 +69,14 @@ class BeagleCamSensorBase(CoordinatorEntity[BeagleCamDataUpdateCoordinator], Sen
 
 
 class BeagleCamStatusSensor(BeagleCamSensorBase):
+    """Status sensor for BeagleCam printer.
+
+    State is one of the PRINT_STATE values:
+        PRINT_STATE_PRINTING: "printing",
+        PRINT_STATE_IDLE: "idle",
+        PRINT_STATE_PAUSED: "paused",
+        PRINT_STATE_COMPLETED: "completed",
+    """
     _attr_icon = "mdi:printer-3d"
 
     def __init__(
@@ -89,6 +101,12 @@ class BeagleCamStatusSensor(BeagleCamSensorBase):
 
 
 class BeagleCamJobPercentageSensor(BeagleCamSensorBase):
+    """Job completion percentage sensor for BeagleCam printer.
+
+    If a print is paused, the percentage will not increase until printing is resumed.
+    If a print is stopped, the percentage will remain at its last value.
+    This behavior comes from the BeagleCam API.
+    """
     _attr_native_unit_of_measurement = PERCENTAGE
     _attr_icon = "mdi:file-percent"
 
@@ -112,6 +130,12 @@ class BeagleCamJobPercentageSensor(BeagleCamSensorBase):
 
 
 class BeagleCamEstimatedFinishTimeSensor(BeagleCamSensorBase):
+    """Estimated finish time sensor for BeagleCam printer.
+
+    This is a minute-precision timestamp calculated by adding the time left
+    to the last read time. If the printer is not currently printing, the sensor
+    will return None.
+    """
     _attr_device_class = SensorDeviceClass.TIMESTAMP
 
     def __init__(
@@ -137,6 +161,11 @@ class BeagleCamEstimatedFinishTimeSensor(BeagleCamSensorBase):
 
 
 class BeagleCamStartTimeSensor(BeagleCamSensorBase):
+    """Start time sensor for BeagleCam printer.
+
+    This is a minute-precision timestamp calculated by subtracting the time cost
+    from the last read time. If the printer is not currently printing, the sensor
+    will return None."""
     _attr_device_class = SensorDeviceClass.TIMESTAMP
 
     def __init__(
@@ -162,6 +191,13 @@ class BeagleCamStartTimeSensor(BeagleCamSensorBase):
 
 
 class BeagleCamTemperatureSensor(BeagleCamSensorBase):
+    """Temperature sensor for BeagleCam printer.
+
+    This sensor can represent either the actual or target temperature for both
+    the nozzle and the bed. One instance of this class is created for each combination.
+
+    The API provides only whole number temperatures.
+    """
     _attr_native_unit_of_measurement = UnitOfTemperature.CELSIUS
     _attr_device_class = SensorDeviceClass.TEMPERATURE
     _attr_state_class = SensorStateClass.MEASUREMENT
@@ -188,7 +224,7 @@ class BeagleCamTemperatureSensor(BeagleCamSensorBase):
         if not printer:
             return None
 
-        return round(printer.get(self.key, None), 2) if printer.get(self.key, None) is not None else None
+        return round(printer.get(self.key, None), 0) if printer.get(self.key, None) is not None else None
 
     @property
     def available(self) -> bool:
@@ -197,6 +233,12 @@ class BeagleCamTemperatureSensor(BeagleCamSensorBase):
 
 
 class BeagleCamFileNameSensor(BeagleCamSensorBase):
+    """File name sensor for BeagleCam printer.
+
+    Similar to the job completion percentage sensor, if a print is paused or stopped,
+    the file name will remain the same until a new print is started or the stop/completed
+    button is pressed in the BeagleCam interface.
+    """
 
     def __init__(
             self,

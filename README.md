@@ -2,7 +2,7 @@
 
 [![hacs_badge](https://img.shields.io/badge/HACS-Custom-orange.svg)](https://hacs.xyz)
 
-Custom integration to monitor your **Minton BeagleCam** (3D printer camera) inside [Home Assistant](https://www.home-assistant.io/).
+Custom integration to monitor your **Mintion BeagleCam** (3D printer camera) inside [Home Assistant](https://www.home-assistant.io/).
 
 ---
 

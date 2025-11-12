@@ -18,8 +18,10 @@ PLATFORMS = [Platform.SENSOR, Platform.CAMERA, Platform.BINARY_SENSOR]
 
 _LOGGER = logging.getLogger(__name__)
 
+"""The BeagleCam integration."""
 
 async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry):
+    """Set up BeagleCam from a config entry."""
     hass.data.setdefault(DOMAIN, {})
     session = async_get_clientsession(hass)
 

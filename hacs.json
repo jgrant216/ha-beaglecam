@@ -4,6 +4,6 @@
   "documentation": "https://github.com/jgrant216/ha-beaglecam",
   "codeowners": ["@jgrant216", "@epowell"],
   "requirements": [],
-  "version": "0.2.0",
+  "version": "0.1.0",
   "content_in_root": false
 }

@@ -17,9 +17,17 @@ from .const import DOMAIN, DEFAULT_SCAN_INTERVAL
 
 _LOGGER = logging.getLogger(__name__)
 
+"""Data update coordinator for BeagleCam integration."""
 
 class BeagleCamDataUpdateCoordinator(DataUpdateCoordinator):
-    """Class to manage fetching data from the BeagleCam API"""
+    """Class to manage fetching data from the BeagleCam API
+
+    Data is fetched once per refresh interval and stored in self.data as a dictionary with keys:
+    - "camera": Camera information
+    - "printer": Printer status information
+    - "job": Current print job information
+    - "last_read_time": Timestamp of the last successful data fetch
+    """
 
     config_entry: ConfigEntry
 

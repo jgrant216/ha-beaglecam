@@ -5,6 +5,7 @@ import logging
 
 _LOGGER = logging.getLogger(__name__)
 
+"""Constants representing print states from BeagleCam API."""
 PRINT_STATE_PRINTING = 101
 PRINT_STATE_IDLE = 102
 PRINT_STATE_PAUSED = 103
@@ -18,6 +19,14 @@ PRINT_STATE = {
 }
 
 class BeagleCamAPI:
+    """Client for interacting with the BeagleCam API.
+
+    All API calls are performed via HTTP POST requests to the /set3DPiCmd endpoint.
+
+    API calls were discovered by inspecting network traffic between the BeagleCam web application and the BeagleCam device.
+    As such, the API may not be officially documented and could change in future firmware updates. Plus we may have
+    missed specific status codes or parameters.
+    """
     def __init__(self, ip: str, username: str, password: str, session: aiohttp.ClientSession):
         self._url = f"http://{ip}/set3DPiCmd"
         self._username = username
@@ -249,6 +258,14 @@ class BeagleCamAPI:
 
     async def get_model(self):
         """
+        The get_model API call retrieves the list of supported 3D printer brands and models, and includes details for
+        all possible printer configurations. It also indicates the currently selected printer model and its specifications.
+
+        This API response is LONG and DETAILED. In practice, only the "selected" field is useful for determining the
+        current printer model, while the "BrandModelList" provides a comprehensive list of supported printers.
+
+        This BrandModelList was captured from a BeagleCam v2 device with firmware version 1.2.9 and may change in future updates.
+
         Example API Return:
         {
           "cmd": 253,
