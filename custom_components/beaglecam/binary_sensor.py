@@ -4,10 +4,10 @@ from homeassistant.core import HomeAssistant
 from homeassistant.helpers.device_registry import DeviceInfo
 from homeassistant.helpers.entity_platform import AddConfigEntryEntitiesCallback
 from homeassistant.helpers.update_coordinator import CoordinatorEntity
-from sensor import _is_printer_printing
 
 from .const import DOMAIN
 from .coordinator import BeagleCamDataUpdateCoordinator
+from .sensor import _is_printer_printing
 
 """Binary sensor platform for BeagleCam integration."""
 
