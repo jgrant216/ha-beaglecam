@@ -1,11 +1,12 @@
 {
   "domain": "beaglecam",
   "name": "BeagleCam Printer Camera",
-  "version": "1.0.0",
+  "version": "2.0.0",
   "documentation": "https://github.com/jgrant216/ha-beaglecam",
   "dependencies": [],
   "codeowners": [
-    "@jgrant216", "@epowell"
+    "@jgrant216",
+    "@epowell"
   ],
   "config_flow": true,
   "iot_class": "local_polling",
