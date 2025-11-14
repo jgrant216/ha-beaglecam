@@ -5,7 +5,7 @@
   "documentation": "https://github.com/jgrant216/ha-beaglecam",
   "dependencies": [],
   "codeowners": [
-    "@jgrant216"
+    "@jgrant216", "@epowell"
   ],
   "config_flow": true,
   "iot_class": "local_polling",
