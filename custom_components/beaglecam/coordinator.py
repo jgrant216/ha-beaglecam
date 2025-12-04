@@ -66,6 +66,7 @@ class BeagleCamDataUpdateCoordinator(DataUpdateCoordinator):
 
             # Printer is online – proceed with normal status polling
             print_status = await self._beaglecam.get_print_status()
+            model_info = await self._beaglecam.get_model_info(print_status.get("file_name"))
             temp_status = await self._beaglecam.get_temperature_status()
 
             # Merge API responses
@@ -74,6 +75,7 @@ class BeagleCamDataUpdateCoordinator(DataUpdateCoordinator):
                 **{k: v for k, v in connection.items() if k not in ("cmd", "result")},
             }
             job_state = {
+                ** {k: v for k, v in model_info.items() if k not in ("cmd", "result")},
                 ** {k: v for k, v in print_status.items() if k not in ("cmd", "result")},
             }
 
