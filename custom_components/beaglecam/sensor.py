@@ -35,6 +35,8 @@ async def async_setup_entry(hass: HomeAssistant, entry: ConfigEntry,
             BeagleCamFileNameSensor(coordinator, device_id),
             BeagleCamStartTimeSensor(coordinator, device_id),
             BeagleCamEstimatedFinishTimeSensor(coordinator, device_id),
+            BeagleCamTotalLayerCountSensor(coordinator, device_id),
+            BeagleCamCurrentLayerNumberSensor(coordinator, device_id),
         ]
     async_add_entities(entities)
 
@@ -262,3 +264,61 @@ class BeagleCamFileNameSensor(BeagleCamSensorBase):
             return False
         job = self.coordinator.data.get("job", None)
         return job and "file_name" in job
+
+class BeagleCamTotalLayerCountSensor(BeagleCamSensorBase):
+    """Sensor that exposes layerCount field returned by get_model_info."""
+    _attr_state_class = SensorStateClass.MEASUREMENT
+
+    def __init__(
+        self,
+        coordinator: BeagleCamDataUpdateCoordinator,
+        device_id: str,
+    ) -> None:
+        super().__init__(coordinator, device_id, "total_layer_count")
+
+        # How it appears in Home Assistant
+        self._attr_name = "BeagleCam Total Layers"
+
+    @property
+    def native_value(self):
+        """Return sensor value."""
+        job = self.coordinator.data.get("job", None)
+        if not job \
+                or not (layerCount := job.get("layerCount", None)) \
+                or not _is_printer_printing(self.coordinator.data["printer"]):
+            return None
+
+        return int(layerCount)
+
+    @property
+    def icon(self):
+        return "mdi:numeric-1-box-multiple-outline"
+
+class BeagleCamCurrentLayerNumberSensor(BeagleCamSensorBase):
+    """Sensor that exposes layerIndex field returned by get_print_status."""
+    _attr_state_class = SensorStateClass.MEASUREMENT
+
+    def __init__(
+        self,
+        coordinator: BeagleCamDataUpdateCoordinator,
+        device_id: str,
+    ) -> None:
+        super().__init__(coordinator, device_id, "current_layer_index")
+
+        # How it appears in Home Assistant
+        self._attr_name = "BeagleCam Current Layer Index"
+
+    @property
+    def native_value(self):
+        """Return sensor value."""
+        job = self.coordinator.data.get("job", None)
+        if not job \
+                or not (layerIndex := job.get("layerIndex", None)) \
+                or not _is_printer_printing(self.coordinator.data["printer"]):
+            return None
+
+        return int(layerIndex)
+
+    @property
+    def icon(self):
+        return "mdi:numeric-1-box-multiple-outline"

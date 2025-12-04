@@ -64,5 +64,29 @@ After setup, you'll see a single BeagleCam device with 10 sensor entities, inclu
 - `sensor.beaglecam_actual_bed_temp`: Current bed temperature
 - `sensor.beaglecam_target_nozzle_temperature`: Target nozzle temperature
 - `sensor.beaglecam_target_bed_temperature`: Target bed temperature
+- `sensor.beaglecam_total_layer_number`: Total number of layers to print
+- `sensor.beaglecam_layer_remaining_percent`: Current layer number being printed
 
 Plus, a camera entity: `camera.beaglecam_camera`
+
+## ⚙️ Template Example
+
+### Layer Remaining Percent
+
+This is a useful simple sensor to show a dial gauge for progress based on height.
+
+![template_layer_remaining_percent](images/template_layer_remaining_percent.png)
+
+```python
+templates:
+  - sensor:
+      - name: "BeagleCam Layer Remaining Percent"
+        unique_id: beaglecam_layer_remaining_percent
+        unit_of_measurement: "%"
+        availability: >
+            {{ states('sensor.beaglecam_total_layer_number') | int(0) > 0 }}
+        state: >
+          {% set current = states('sensor.beaglecam_current_layer_index') | int(0) %}
+          {% set total = states('sensor.beaglecam_total_layer_number') | int(0) %}
+          {{ (current / total * 100) | round(1) if total > 0 else 0 }}
+```
