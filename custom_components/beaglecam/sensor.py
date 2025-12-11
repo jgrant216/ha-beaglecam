@@ -101,6 +101,16 @@ class BeagleCamStatusSensor(BeagleCamSensorBase):
         """Return if entity is available."""
         return self.coordinator.last_update_success and self.coordinator.data["printer"]
 
+    @property
+    def extra_state_attributes(self):
+        """Return additional attributes for the sensor."""
+        tlv = self.coordinator.data.get("tlv", None)
+        if not tlv:
+            return None
+
+        # Only include non-None attributes in the dictionary
+        return {key: value for key, value in tlv.items() if value is not None}
+
 
 class BeagleCamJobPercentageSensor(BeagleCamSensorBase):
     """Job completion percentage sensor for BeagleCam printer.

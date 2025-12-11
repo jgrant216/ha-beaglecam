@@ -49,6 +49,7 @@ class BeagleCamDataUpdateCoordinator(DataUpdateCoordinator):
         self._beaglecam = beaglecam
         self._printer_offline = False
         self.data = {"camera": None, "printer": None, "job": None, "last_read_time": None}
+        self.camera_info = None
 
     async def _async_update_data(self):
         if self._beaglecam.closed:
@@ -68,6 +69,7 @@ class BeagleCamDataUpdateCoordinator(DataUpdateCoordinator):
             print_status = await self._beaglecam.get_print_status()
             model_info = await self._beaglecam.get_model_info(print_status.get("file_name"))
             temp_status = await self._beaglecam.get_temperature_status()
+            tlv = {k: v for k, v in (await self._beaglecam.get_tlv_params()).items() if k not in ("cmd", "result")}
 
             # Merge API responses
             printer_state = {
@@ -81,7 +83,8 @@ class BeagleCamDataUpdateCoordinator(DataUpdateCoordinator):
 
             _LOGGER.debug("Combined BeagleCam data: %s", printer_state)
             _LOGGER.debug("Combined BeagleCam Job data: %s", job_state)
-            return {"job": job_state, "printer": printer_state, "last_read_time": dt.utcnow()}
+            _LOGGER.debug("BeagleCam tlv data: %s", tlv)
+            return {"job": job_state, "printer": printer_state, "last_read_time": dt.utcnow(), "tlv": tlv}
 
         except HTTPError as httperr:
             _LOGGER.exception("BeagleCam HTTP error: %s status: %s reason: %s", httperr, httperr.status, httperr.reason)
@@ -94,7 +97,24 @@ class BeagleCamDataUpdateCoordinator(DataUpdateCoordinator):
         """Set up the coordinator.
         """
         try:
-            self.data["camera"] = await self._beaglecam.get_info()
+            try:
+                connection = await self._beaglecam.get_connection_state()
+            except Exception as err:
+                _LOGGER.debug("BeagleCam is offline. Polling again in 300s.")
+                await asyncio.sleep(300)  # throttle manually
+                return None
+
+            camera_info = await self._beaglecam.get_info()
+            baudrate = await self._beaglecam.get_baudrate()
+
+            if not camera_info or not baudrate:
+                return None
+
+            self.camera_info = {
+                ** {k: v for k, v in camera_info.items() if k not in ("cmd", "result")},
+                ** {k: v for k, v in baudrate.items() if k not in ("cmd", "result")},
+            }
+            _LOGGER.debug("Combined BeagleCam Camera Info data: %s", self.camera_info)
         except HTTPError as httperr:
             _LOGGER.warning("BeagleCam HTTP error: %s status: %s reason: %s", httperr, httperr.status, httperr.reason)
             raise UpdateFailed(f"Data fetch failed: {httperr}") from httperr

@@ -1,3 +1,5 @@
+import logging
+
 from homeassistant.components.binary_sensor import BinarySensorEntity
 from homeassistant.config_entries import ConfigEntry
 from homeassistant.core import HomeAssistant
@@ -8,6 +10,8 @@ from homeassistant.helpers.update_coordinator import CoordinatorEntity
 from .const import DOMAIN
 from .coordinator import BeagleCamDataUpdateCoordinator
 from .sensor import _is_printer_printing
+
+_LOGGER = logging.getLogger(__name__)
 
 """Binary sensor platform for BeagleCam integration."""
 
@@ -65,3 +69,14 @@ class BeagleCamPrintingBinarySensor(CoordinatorEntity[BeagleCamDataUpdateCoordin
     def device_info(self) -> DeviceInfo:
         """Return device info."""
         return self.coordinator.device_info
+
+    @property
+    def extra_state_attributes(self):
+        """Return additional attributes for the sensor."""
+        camera_info = self.coordinator.camera_info
+        _LOGGER.debug(f"BeagleCamStatusSensor.extra_state_attributes.camera_info=${camera_info}")
+        if not camera_info: # failing here
+            return None
+
+        # Only include non-None attributes in the dictionary
+        return {key: value for key, value in camera_info.items() if value is not None}

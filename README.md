@@ -90,3 +90,13 @@ templates:
           {% set total = states('sensor.beaglecam_total_layer_number') | int(0) %}
           {{ (current / total * 100) | round(1) if total > 0 else 0 }}
 ```
+
+## Screenshots
+
+Current State
+![current_state_with_attributes](images/current_state_with_attributes.png)
+
+
+Printing State
+![printing_state_with_attributes](images/printing_state_with_attributes.png)
+
